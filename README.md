@@ -1,13 +1,10 @@
 # Healthcare Management System - Software Re-Engineering Project
 
-Course Project for Software Re-Engineering [SE-7A]
+Course Project for Software Re-Engineering
 Department of Software Engineering, SMIU
 
-## Team Members
-- Farhan Ahmed Khan [BSE-23S-020]
-- Muhammad Uzair Attari [BSE-23S-036]
-- Zain Ul Abideen [BSE-23S-016]
-- Syed Yousuf Ahmed [BSE-23S-059]
+## Project By
+- Farhan Ahmed Khan
 
 ## Project Overview
 This project re-engineers a legacy PHP Healthcare Management System into a 
