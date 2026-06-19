@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Healthcare Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
+        .navbar { background: #B85042; padding: 15px 30px; color: white; }
+        .navbar h1 { margin: 0; font-size: 22px; }
+        .navbar span { font-size: 13px; opacity: 0.8; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        h2 { color: #B85042; margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #B85042; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #fdf5f4; }
+        input { width: 100%; padding: 8px; margin: 6px 0 14px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn { background: #B85042; color: white; padding: 10px 25px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #9B3B32; }
+        .success { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <h1>Healthcare Management System</h1>
+    <span>Re-Engineered with Python Flask + PostgreSQL</span>
+</div>
+<div class="container">
+    <div class="grid">
+        <div class="card" style="text-align:center;">
+            <h2 style="font-size:40px; margin:0;" id="patient-count">...</h2>
+            <p style="color:#666; margin:5px 0;">Total Patients</p>
+        </div>
+        <div class="card" style="text-align:center;">
+            <h2 style="font-size:40px; margin:0; color:#A7BEAE;">Online</h2>
+            <p style="color:#666; margin:5px 0;">System Status</p>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Add New Patient</h2>
+        <div id="success-msg" class="success" style="display:none;">Patient added successfully!</div>
+        <div class="grid">
+            <div>
+                <label>Full Name</label>
+                <input type="text" id="full_name" placeholder="e.g. Ahmed Ali">
+                <label>Phone</label>
+                <input type="text" id="phone" placeholder="e.g. 03001234567">
+            </div>
+            <div>
+                <label>Blood Group</label>
+                <input type="text" id="blood_group" placeholder="e.g. A+">
+                <label>Age</label>
+                <input type="number" id="age" placeholder="e.g. 30">
+            </div>
+        </div>
+        <label>Address</label>
+        <input type="text" id="address" placeholder="e.g. Karachi">
+        <button class="btn" onclick="addPatient()">Add Patient</button>
+    </div>
+    <div class="card">
+        <h2>All Patients</h2>
+        <table>
+            <thead>
+                <tr><th>ID</th><th>Name</th><th>Phone</th><th>Blood Group</th><th>Age</th></tr>
+            </thead>
+            <tbody id="patients-table">
+                <tr><td colspan="5">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+async function loadPatients() {
+    const res = await fetch('/api/v1/patients');
+    const patients = await res.json();
+    document.getElementById('patient-count').textContent = patients.length;
+    const tbody = document.getElementById('patients-table');
+    if (patients.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">No patients yet.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = patients.map(p => `
+        <tr>
+            <td>${p.patient_id}</td>
+            <td>${p.full_name}</td>
+            <td>${p.phone || '-'}</td>
+            <td>${p.blood_group || '-'}</td>
+            <td>${p.age || '-'}</td>
+        </tr>
+    `).join('');
+}
+async function addPatient() {
+    const data = {
+        full_name: document.getElementById('full_name').value,
+        phone: document.getElementById('phone').value,
+        blood_group: document.getElementById('blood_group').value,
+        age: parseInt(document.getElementById('age').value),
+        address: document.getElementById('address').value
+    };
+    if (!data.full_name) { alert('Please enter a name'); return; }
+    const res = await fetch('/api/v1/patients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    if (res.ok) {
+        document.getElementById('success-msg').style.display = 'block';
+        document.getElementById('full_name').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('blood_group').value = '';
+        document.getElementById('age').value = '';
+        document.getElementById('address').value = '';
+        setTimeout(() => { document.getElementById('success-msg').style.display = 'none'; }, 3000);
+        loadPatients();
+    }
+}
+loadPatients();
+</script>
+</body>
+</html>
